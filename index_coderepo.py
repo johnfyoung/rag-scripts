@@ -9,10 +9,11 @@ from llama_index.core import Settings
 # 1. Global Settings (The "Brain" configuration)
 # Using a local embedding model so BigDummy does the work, not the cloud
 Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
+DB_PATH = "/home/jray/bigdummy_vector_db"
 
 # 2. Setup Persistent Storage on BigDummy
 # This folder will hold ALL your collections
-db = chromadb.PersistentClient(path="~/cac-rag-projects/bigdummy_vector_db")
+db = chromadb.PersistentClient(path=DB_PATH)
 
 def index_repository(repo_path, collection_name):
     print(f"--- Indexing {collection_name} ---")
