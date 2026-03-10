@@ -1,0 +1,54 @@
+name: Big Dummy
+version: 1.0.0
+schema: v1
+# Top-level settings
+disableIndexing: true
+disableLocalEmbeddings: true
+
+models:
+  - name: "BigDummy (Qwen 122B)"
+    provider: "openai"
+    model: "qwen3.5-122b"
+    apiBase: "http://bigdummy.mudskipper-elevator.ts.net:1234/v1"
+    apiKey: "sk-local-bigdummy"
+    contextLength: 12288
+    # Enable tools specifically for this model
+    capabilities:
+      - tool_use
+    systemPrompt: |
+      You are a specialized coding assistant. 
+      CRITICAL: Use 'BigDummy-RAG' tools for codebase info. Do not crawl directories.
+      You also have GitHub access for commits/PRs.
+
+mcpServers:
+  - name: "BigDummy-RAG"
+    type: "stdio"
+    command: "ssh"
+    args:
+      - "jray@bigdummy.mudskipper-elevator.ts.net"
+      - "/home/jray/litellm-venv/bin/python3"
+      - "/home/jray/cac-rag-projects/rag_scripts/mcp_bridge.py"
+    allowedTools:
+      - "search_project_code"
+      - "list_indexed_projects"
+      - "write_code_file"
+      - "read_server_logs"
+
+  - name: "github"
+    type: "stdio"
+    command: "npx"
+    args:
+      - "-y"
+      - "@modelcontextprotocol/server-github"
+    env:
+      GITHUB_PERSONAL_ACCESS_TOKEN: "GITHUB PAT HERE" # Ensure the space after the colon!
+  - name: "tavily"
+    type: "stdio"
+    command: "npx"
+    args:
+      - "-y"
+      - "mcp-remote"
+      - "https://mcp.tavily.com/mcp/?tavilyApiKey=tvly-API KEY HERE"
+context:
+  - provider: "file"
+  - provider: "terminal"
