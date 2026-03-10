@@ -74,6 +74,23 @@ def read_server_logs(lines: int = 50) -> str:
     except Exception as e:
         return f"❌ Failed to read logs: {str(e)}"
 
+current_project = "default"
+
+@mcp.tool()
+def switch_active_project(project_name: str) -> str:
+    """
+    Tells the RAG bridge which project collection to focus on.
+    Use this when switching from 'habit-tracker' to 'web-app'.
+    """
+    global current_project
+    # Verify the collection exists in Chroma first
+    collections = [c.name for c in db.list_collections()]
+    if project_name in collections:
+        current_project = project_name
+        return f"✅ Switched RAG focus to: {project_name}"
+    else:
+        return f"❌ Project '{project_name}' not found. Available: {', '.join(collections)}"
+
 if __name__ == "__main__":
     try:
         # transport="stdio" is required for the SSH bridge to work
