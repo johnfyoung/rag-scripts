@@ -1,4 +1,4 @@
-import os, chromadb
+import os, chromadb, datetime
 from fastmcp import FastMCP
 from llama_index.core import VectorStoreIndex, StorageContext, Settings
 from llama_index.vector_stores.chroma import ChromaVectorStore
@@ -54,25 +54,33 @@ def write_code_file(file_path: str, content: str) -> str:
     except Exception as e:
         return f"❌ Failed to write file: {str(e)}"
 
-@mcp.tool()
-def read_server_logs(lines: int = 50) -> str:
-    """
-    Reads the last N lines of the BigDummy server logs.
-    Use this to diagnose connection issues, GPU errors, or RAG failures.
-    """
-    LOG_FILE = "/home/jray/bigdummy_logs/bigdummy_server.log"
-    try:
-        if not os.path.exists(LOG_FILE):
-            return f"Error: Log file not found at {LOG_FILE}"
+# import re
+
+# @mcp.tool()
+# def read_server_logs(lines: int = 50) -> str:
+#     """Reads logs, filters spam, and strips timestamps to protect the LLM cache."""
+#     LOG_FILE = "/home/jray/bigdummy_logs/bigdummy_server.log"
+#     try:
+#         if not os.path.exists(LOG_FILE):
+#             return "Log file not found."
             
-        # Efficiently read the tail of the file
-        with open(LOG_FILE, "r") as f:
-            # We use a simple list slice for the last N lines
-            content = f.readlines()
-            last_lines = content[-lines:]
-            return "".join(last_lines)
-    except Exception as e:
-        return f"❌ Failed to read logs: {str(e)}"
+#         with open(LOG_FILE, "r") as f:
+#             content = f.readlines()
+            
+#         filtered = []
+#         for line in content:
+#             # Skip the verbose progress spam
+#             if any(x in line for x in ["progress =", "memory_seq_rm", "sampler chain", "slot update"]):
+#                 continue
+            
+#             # Use Regex to strip the timestamp [YYYY-MM-DDTHH:MM:SS] 
+#             # This makes the log text "static" so the cache stays valid!
+#             clean_line = re.sub(r'^\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\]\s*', '', line)
+#             filtered.append(clean_line)
+        
+#         return "".join(filtered[-lines:])
+#     except Exception as e:
+#         return f"Error reading logs: {e}"
 
 current_project = "default"
 
